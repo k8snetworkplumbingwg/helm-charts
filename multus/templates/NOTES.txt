@@ -1,5 +1,5 @@
 ======
-{{- if ge .Capabilities.KubeVersion.Minor "16" }}
+{{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
 1. The following components have been deployed as part of this helm chart:
 {{- if .Values.manifests.clusterRole }}
 Cluster Role: {{ .Values.serviceAccount.name }}
@@ -30,5 +30,5 @@ You may have to manually delete CRD -
 kubectl delete crd network-attachment-definitions.k8s.cni.cncf.io
 ---------
 {{- else }}
-To run these charts, please use K8s version > 1.16
+To run these charts, please use K8s ver >= v1.16
 {{- end }}
