@@ -1,0 +1,37 @@
+======
+{{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
+1. The following components have been deployed as part of this helm chart:
+{{- if .Values.manifests.serviceAccount }}
+Service Account: {{ .Values.serviceAccount.name }}
+{{- end }}
+{{- if .Values.manifests.configMap_sriov_device_plugin }}
+Config Map: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
+{{- end }}
+{{- if .Values.manifests.daemonSet_sriov_device_plugin }}
+Daemon Set: {{ .Release.Name }}-{{ .Chart.Name }}-device-plugin-ds
+{{- end }}
+{{- if .Values.manifests.daemonSet_sriov_cni }}
+Daemon Set: {{ .Release.Name }}-{{ .Chart.Name }}-cni-ds
+{{- end }}
+{{- if .Values.manifests.net_attach_def_netdev }}
+Network Attachment Definition for NetDevice: {{ .Values.config.netAttachDef.netdeviceName }} 
+{{- end }}
+{{- if .Values.manifests.net_attach_def_dpdk }}
+Network Attachment Definition for DPDK: {{ .Values.config.netAttachDef.dpdkName }} 
+{{- end }}
+{{- if .Values.manifests.test_netdevice }}
+Example pod with nedevice interface: {{ .Release.Name }}-test-netdevice 
+{{- end }}
+{{- if .Values.manifests.test_dpdk }}
+Example pod with dpdk interface: {{ .Release.Name }}-test-dpdk 
+{{- end }}
+
+You can now create more Network Attachment Definitions or test SRIOV pods using Network Attachment Defintions as mentioned above.
+---------
+
+2. To uninstall helm chart use the command:
+helm delete {{ .Release.Name }}
+---------
+{{- else }}
+To run these charts, please use K8s ver >= v1.16
+{{- end }}

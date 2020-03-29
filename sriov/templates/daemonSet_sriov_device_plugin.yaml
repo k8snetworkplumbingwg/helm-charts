@@ -1,0 +1,75 @@
+# Copyright 2020 K8s Network Plumbing Group
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+{{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
+{{- if .Values.manifests.daemonSet_sriov_device_plugin }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-{{ .Chart.Name }}-device-plugin-ds
+  namespace: kube-system
+  labels:
+{{- include "sriov-dp.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+{{- include "sriov-dp.serviceAccount.Name" . | indent 6 }}
+{{- include "sriov-dp.labels" . | indent 6 }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+{{- include "sriov-dp.serviceAccount.Name" . | indent 8 }}
+{{- include "sriov-dp.labels" . | indent 8 }}
+    spec:
+      hostNetwork: true
+      nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+      - name: kube-{{ .Chart.Name }}-dp
+        image: {{ .Values.images.sriovDevicePlugin.repository }}:{{ .Values.images.sriovDevicePlugin.tag }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        args:
+        - --log-dir=sriovdp
+        - --log-level=10
+        securityContext:
+          privileged: {{ .Values.securityContext.privileged }}
+        volumeMounts:
+        - name: devicesock
+          mountPath: {{ .Values.config.sdpMountPaths.deviceSock }}
+          readOnly: false
+        - name: log
+          mountPath: {{ .Values.config.sdpMountPaths.log }}
+        - name: config-volume
+          mountPath: {{ .Values.config.sdpMountPaths.configVolume }}
+          subPath: "dp-conf.json"
+      volumes:
+        - name: devicesock
+          hostPath:
+            path: {{ .Values.config.sdpMountPaths.deviceSock }}
+        - name: log
+          hostPath:
+            path: {{ .Values.config.sdpMountPaths.log }}
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
+{{- end }}
+{{- end }}

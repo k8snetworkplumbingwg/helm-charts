@@ -1,0 +1,165 @@
+# Copyright 2020 K8s Network Plumbing Group
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+# Default values for sriov.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+#replicaCount: 1
+
+images:
+  registry: docker.io
+  sriovCni:
+    repository: nfvpe/sriov-cni
+    tag: v2.2
+  sriovDevicePlugin:
+    repository: nfvpe/sriov-device-plugin
+    tag: v3.1
+  pullPolicy: IfNotPresent
+
+#imagePullSecrets: []
+#nameOverride: ""
+#fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  #create: true
+  # Annotations to add to the service account
+  #annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: sriov-device-plugin-test
+
+pod:
+  resources:
+    enabled: true
+    sriov_cni:
+      requests:
+        memory: "50Mi"
+        cpu: "100m"
+      limits:
+        memory: "50Mi"
+        cpu: "100m"
+
+#podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  privileged: true
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+#service:
+  #type: ClusterIP
+  #port: 80
+
+#ingress:
+  #enabled: false
+  #annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  #hosts:
+    #- host: chart-example.local
+    #  paths: []
+  #tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+labels:
+  nodeSelector:
+    kubernetes.io/arch: amd64
+
+config:
+  scMountPaths:
+    cnibin: "/host/opt/cni/bin"
+  sdpMountPaths:
+    deviceSock: "/var/lib/kubelet/device-plugins/"
+    log: "/var/log"
+    configVolume: "/etc/pcidp/config.json"
+  sriov_device_plugin:
+    resourceList:
+    - resourceName: intel_sriov_netdevice
+      selectors:
+        vendors:
+        - '8086'
+        devices:
+        - 154c
+        - 10ed
+        drivers:
+        - i40evf
+        - ixgbevf
+    - resourceName: intel_sriov_dpdk
+      selectors:
+        vendors:
+        - '8086'
+        devices:
+        - 154c
+        - 10ed
+        drivers:
+        - vfio-pci
+        pfNames:
+        - enp67s0f1#8-31
+        - enp68s0f0#8-31
+    - resourceName: mlnx_sriov_rdma
+      isRdma: true
+      selectors:
+        vendors:
+        - 15b3
+        devices:
+        - '1018'
+        drivers:
+        - mlx5_ib
+  netAttachDef:
+    dpdkName: 30-intel-sriov-dpdk
+    dpdkResourceName: intel.com/intel_sriov_dpdk
+    dpdk:
+      type: sriov
+      cniVersion: 0.3.1
+      name: sriov-dpdk-network
+      vlan: 1000
+      spoofchk: "off"
+      trust: "on"
+    netdeviceName: 20-intel-sriov-netdevice
+    netdeviceResourceName: intel.com/intel_sriov_netdevice
+    netdevice:
+      type: sriov
+      cniVersion: 0.3.1
+      name: sriov-network
+      ipam:
+        type: host-local
+        subnet: 10.10.10.0/24
+        rangeStart: 10.10.10.51
+        rangeEnd: 10.10.10.100
+        routes:
+          - dst: 0.0.0.0/0
+      gateway: 10.10.10.1
+
+manifests:
+  serviceAccount: true
+  configMap_sriov_device_plugin: true
+  daemonSet_sriov_device_plugin: true
+  daemonSet_sriov_cni: true
+  net_attach_def_netdev: true
+  net_attach_def_dpdk: true
+  test_netdevice: true
+  test_dpdk: true
+
+#tolerations: []
+
+#affinity: {}
