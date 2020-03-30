@@ -202,6 +202,6 @@ manifests:
   test_netdevice: true
   test_dpdk: true
 ```
-On can disable the creation of network attachment definitions and test pods by setting value `false` in configuration above. At this stage, you can create more network-attachment-definitions and pods for SR-IOV according to your environment.
+One can disable the creation of network attachment definitions and test pods by setting value `false` in configuration above. At this stage, you can create more network-attachment-definitions and pods for SR-IOV according to your environment.
 
-So far, we have seen the deployment of Multus and SR-IOV CNI using helm charts. Post deployment of each of these charts, the output shows the components deployed as part of helm deployment. It also states the steps to uninstall the helm charts in the environment.
+Finally, we have seen how to deploy Multus and SR-IOV CNI using helm charts. Post deployment of each of these charts, the output shows the components deployed as part of helm deployment. It also states the steps to uninstall the helm charts in the environment.
