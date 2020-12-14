@@ -48,13 +48,13 @@ spec:
             mountPath: /host/opt/cni/bin
           - name: cni-net-dir
             mountPath: /host/etc/cni/net.d
-        volumes:
-          - name: cnibin
-            hostPath:
-              path: /opt/cni/bin
-          - name: cni-net-dir
-            hostPath:
-              path: /etc/cni/net.d
+      volumes:
+        - name: cnibin
+          hostPath:
+            path: /opt/cni/bin
+        - name: cni-net-dir
+          hostPath:
+            path: /etc/cni/net.d
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

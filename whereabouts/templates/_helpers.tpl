@@ -47,6 +47,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "whereabouts.selectorLabels" -}}
+app: {{ include "whereabouts.name" . }}
 app.kubernetes.io/name: {{ include "whereabouts.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
