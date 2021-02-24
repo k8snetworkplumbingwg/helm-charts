@@ -38,9 +38,7 @@ spec:
       hostNetwork: true
       nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
       tolerations:
-      - key: node-role.kubernetes.io/master
-        operator: Exists
-        effect: NoSchedule
+{{- include "sriov.tolerations" . | indent 6 }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-{{ .Chart.Name }}-dp

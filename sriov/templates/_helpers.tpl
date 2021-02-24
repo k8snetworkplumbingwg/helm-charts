@@ -27,3 +27,15 @@ app: {{ .Chart.Name }}-dp
 {{- define "sriov-dp.serviceAccount.Name" }}
 name: {{ .Values.serviceAccount.name }}
 {{- end }}
+
+{{/* Generate SRIOV tolerations */}}
+{{- define "sriov.tolerations" }}
+- key: node-role.kubernetes.io/master
+  operator: Exists
+  effect: NoSchedule
+{{- if index .Values "tolerations" }}
+{{- if gt (len .Values.tolerations) 0 }}
+{{ toYaml .Values.tolerations }}
+{{- end }}
+{{- end }}
+{{- end }}
