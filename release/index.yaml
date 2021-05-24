@@ -1,0 +1,20 @@
+apiVersion: v1
+entries:
+  sriov-network-operator:
+  - apiVersion: v2
+    appVersion: v4.7.0
+    created: "2021-05-24T23:50:37.642792931+03:00"
+    description: SR-IOV network operator configures and manages SR-IOV networks in the kubernetes cluster
+    digest: 01f598a7957f10dc128170ade5e5896583c96d75d81578bc6e2d5a88200b7e51
+    home: https://github.com/k8snetworkplumbingwg/sriov-network-operator
+    keywords:
+    - sriov
+    kubeVersion: '>= 1.16.0'
+    name: sriov-network-operator
+    sources:
+    - https://github.com/k8snetworkplumbingwg/sriov-network-operator
+    type: application
+    urls:
+    - https://k8snetworkplumbingwg.github.io/helm-charts/release/sriov-network-operator-4.7.0.tgz
+    version: 4.7.0
+generated: "2021-05-24T23:50:37.641636945+03:00"
