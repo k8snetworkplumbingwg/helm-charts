@@ -32,7 +32,10 @@ spec:
     metadata:
       labels:
 {{- include "multus.labels" . | indent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
     spec:
+      priorityClassName: system-node-critical
       hostNetwork: true
       nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
       tolerations:

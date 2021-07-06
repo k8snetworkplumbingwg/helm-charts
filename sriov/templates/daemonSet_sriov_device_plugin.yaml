@@ -34,7 +34,10 @@ spec:
       labels:
 {{- include "sriov-dp.serviceAccount.Name" . | indent 8 }}
 {{- include "sriov-dp.labels" . | indent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configMap_sriov_device_plugin.yaml") . | sha256sum }}
     spec:
+      priorityClassName: system-node-critical
       hostNetwork: true
       nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
       tolerations:

@@ -15,7 +15,7 @@ apiVersion: v2
 name: sriov
 description: SR-IOV CNI Helm chart for Kubernetes
 type: application
-version: 0.1.0
+version: 0.1.1
 home: https://github.com/intel/sriov-network-device-plugin
 sources:
   - https://github.com/intel/sriov-network-device-plugin
