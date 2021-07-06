@@ -19,8 +19,8 @@
 #replicaCount: 1
 
 image:
-  repository: docker.io/nfvpe/multus
-  tag: v3.4
+  repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+  tag: v3.8
   pullPolicy: IfNotPresent
 
 #imagePullSecrets: []
