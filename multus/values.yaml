@@ -19,8 +19,7 @@
 #replicaCount: 1
 
 image:
-  registry: docker.io
-  repository: nfvpe/multus
+  repository: docker.io/nfvpe/multus
   tag: v3.4
   pullPolicy: IfNotPresent
 
