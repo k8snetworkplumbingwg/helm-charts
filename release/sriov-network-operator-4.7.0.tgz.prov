@@ -1,0 +1,32 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+apiVersion: v2
+appVersion: v4.7.0
+description: SR-IOV network operator configures and manages SR-IOV networks in the kubernetes cluster
+home: https://github.com/k8snetworkplumbingwg/sriov-network-operator
+keywords:
+- - sriov
+kubeVersion: '>= 1.16.0'
+name: sriov-network-operator
+sources:
+- - https://github.com/k8snetworkplumbingwg/sriov-network-operator
+type: application
+version: 4.7.0
+...
+files:
+  sriov-network-operator-4.7.0.tgz: sha256:01f598a7957f10dc128170ade5e5896583c96d75d81578bc6e2d5a88200b7e51
+-----BEGIN PGP SIGNATURE-----
+
+iQHMBAEBCgA2FiEE7yVl68it+crI25Z2HUQ9+K2NtE8FAmCsEKQYHGlrb2xvZGlh
+emhueUBudmlkaWEuY29tAAoJEB1EPfitjbRPqeEMANjsqxtNkh+gQUecP54V38Qg
+zx3Afl1nocbRP3eY7+n7nd2bax7eZIKNMgFvJoojJiLZCChx7Qcm9kW8Rf6cQ4gd
+c4OwSttjxv0glPZBByFolGRJ8J8DoqRknEY+2yIcHsmFv12MlZ1IvjacpoRYeR7y
+0Hd1CWFsUTjijq8SC+uRDVEWHwhXNEGqnWYs4gvu6AsnbLa48c//mIeWz/NoVHSG
+bEgAt65J2s3EEpHpjkv9n8lgN9nkfwcN0nqKSaXvbQvovYkFOM4UMr/pXgKWo42I
+JfK6k4a+AFaqXZR+WEUhronzPbqmvMrhSPHBZkG4y1cAoyd+pbLSmb2+9wrRShb7
+xnXdFfYfJ0mt4dt25po0cMqt1u6yOq4HFab1K2XELe54uu4R+WavnOkvP9bTKXFS
+glXuJ5UQQPWiFCgpwRDtfPM9y7S2/Y8t3sPEORxPRWB/PZL++PJzZv0dHqc0AWjV
+FLfjduajGoHgSnn1+TJ9nwVfpAsRTd/gDHBVMkMUmA==
+=esvC
+-----END PGP SIGNATURE-----
