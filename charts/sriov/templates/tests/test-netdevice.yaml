@@ -18,11 +18,11 @@ kind: Pod
 metadata:
   name: {{ .Release.Name }}-test-netdevice
   annotations:
-    k8s.v1.cni.cncf.io/networks: {{ .Values.config.netAttachDef.netdeviceName }} 
+    k8s.v1.cni.cncf.io/networks: {{ .Values.config.netAttachDef.netdeviceName }}
 spec:
   containers:
-  - name: appcntr1 
-    image: centos/tools 
+  - name: appcntr1
+    image: centos/tools
     imagePullPolicy: IfNotPresent
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 300000; done;" ]
