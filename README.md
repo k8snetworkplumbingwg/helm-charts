@@ -5,22 +5,21 @@ Helm charts for deployment of NPWG implementations and ancillary tools
 
 Refer Helm [Quickstart Guide](https://helm.sh/docs/intro/quickstart/) and [Installation Guide](https://helm.sh/docs/intro/install/)
 
-Helm charts are generally structured like an example below:
+The Helm charts are located in the `charts` directory. Helm charts are generally structured like an example below:
 ```
-$ tree multus/
-multus/
-|-- charts
-|-- Chart.yaml
-|-- templates
-|   |-- clusterRoleBinding.yaml
-|   |-- clusterRole.yaml
-|   |-- configMap.yaml
-|   |-- customResourceDefinition.yaml
-|   |-- daemonSet.yaml
-|   |-- _helpers.tpl
-|   |-- NOTES.txt
-|   |-- serviceAccount.yaml
-|-- values.yaml
+$ tree charts/multus/
+charts/multus
+├── Chart.yaml
+├── templates
+│   ├── NOTES.txt
+│   ├── _helpers.tpl
+│   ├── clusterRole.yaml
+│   ├── clusterRoleBinding.yaml
+│   ├── configMap.yaml
+│   ├── customResourceDefinition.yaml
+│   ├── daemonSet.yaml
+│   └── serviceAccount.yaml
+└── values.yaml
 ```
 
 Here,
