@@ -21,5 +21,6 @@ icon: https://raw.githubusercontent.com/intel/multus-cni/master/doc/images/Multu
 sources:
   - https://github.com/intel/multus-cni
 maintainers:
-  - name: Network Plumbing Group
+  - name: k8snetworkplumbingwg
+    url: https://github.com/k8snetworkplumbingwg
 appVersion: 0.1.0
