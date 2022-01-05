@@ -6,7 +6,6 @@ metadata:
   labels:
     {{- include "whereabouts.labels" . | nindent 4 }}
 spec:
-
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 0
   schedule: "*/5 * * * *"
@@ -15,24 +14,24 @@ spec:
       backoffLimit: 0
       template:
         metadata:
-        labels:
+          labels:
             name: whereabouts
-            {{- include "whereabouts.selectorLabels" . | nindent 8 }}
+            {{- include "whereabouts.selectorLabels" . | nindent 12 }}
         spec:
           priorityClassName: "system-node-critical"
           serviceAccountName: {{ include "whereabouts.serviceAccountName" . }}
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
-              {{- toYaml . | nindent 8 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
             - name: {{ .Chart.Name }}
-            securityContext:
-                {{- toYaml .Values.securityContext | nindent 12 }}
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            resources:
-                {{- toYaml .Values.resources | nindent 12 }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
               command:
                 - /ip-reconciler
                 - -log-level=verbose
@@ -44,14 +43,15 @@ spec:
               hostPath:
                 path: /etc/cni/net.d
           restartPolicy: OnFailure
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
