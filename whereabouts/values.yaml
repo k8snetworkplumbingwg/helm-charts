@@ -12,6 +12,7 @@ updateStrategy: RollingUpdate
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+namespaceOverride: "kube-system"
 
 serviceAccount:
   # Specifies whether a service account should be created
