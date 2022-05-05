@@ -11,5 +11,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "whereabouts.serviceAccountName" . }}
-  namespace: {{ .Release.Namespace }}
+  {{- include "whereabouts.namespace" . | nindent 2 }}
 {{- end }}

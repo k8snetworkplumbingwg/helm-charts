@@ -24,6 +24,17 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Provide a method to override namespace so parent charts can set it
+*/}}
+{{- define "whereabouts.namespace" -}}
+{{- if hasKey .Values "namespaceOverride" -}}
+namespace: {{ .Values.namespaceOverride }}
+{{- else }}
+namespace: {{ .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "whereabouts.chart" -}}
