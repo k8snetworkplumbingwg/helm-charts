@@ -1,0 +1,99 @@
+# Copyright (c) 2022 K8s Network Plumbing Group
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Chart.Name }}
+  name: {{ .Chart.Name }}
+  namespace: kube-system
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      serviceAccount: {{ .Values.serviceAccount.name }}
+      containers:
+      - name: webhook-server
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - webhook
+        args:
+        - -bind-address={{ .Values.deployment.bindAddress }}
+        - -port={{ .Values.deployment.portNumber }}
+        - -tls-private-key-file=/etc/tls/tls.key
+        - -tls-cert-file=/etc/tls/tls.crt
+        - -logtostderr
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        securityContext:
+          runAsUser: 10000
+          runAsGroup: 10000
+          capabilities:
+            drop:
+              - ALL
+            add: ["NET_BIND_SERVICE"]
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - mountPath: /etc/tls
+          name: tls
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "250m"
+          limits:
+            memory: "200Mi"
+            cpu: "500m"
+{{- if .Values.manifests.thirdpartyCertificate }}
+      volumes:
+      - name: tls
+        secret:
+          secretName: {{ .Values.manifests.certificateSecretName }}
+{{ else }}
+      initContainers:
+      - name: installer
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - installer
+        args:
+        - -name={{ .Chart.Name }}
+        - -namespace=kube-system
+        - -alsologtostderr
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        securityContext:
+          runAsUser: 10000
+          runAsGroup: 10000
+        volumeMounts:
+        - name: tls
+          mountPath: /etc/tls
+      volumes:
+      - name: tls
+        emptyDir: {}
+{{- end }}

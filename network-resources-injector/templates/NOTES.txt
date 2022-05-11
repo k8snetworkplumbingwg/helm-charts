@@ -1,0 +1,5 @@
+network-resources-injector is installed!!
+
+You can view the pods with the following command:
+
+kubectl get pods -n kube-system -l app=network-resources-injector
