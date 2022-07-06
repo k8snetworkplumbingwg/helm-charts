@@ -3,7 +3,7 @@ entries:
   sriov-network-operator:
   - apiVersion: v2
     appVersion: v4.7.0
-    created: "2021-12-16T14:30:36.569884822+02:00"
+    created: "2022-07-04T15:14:07.355424577Z"
     description: SR-IOV network operator configures and manages SR-IOV networks in
       the kubernetes cluster
     digest: 01f598a7957f10dc128170ade5e5896583c96d75d81578bc6e2d5a88200b7e51
@@ -19,11 +19,28 @@ entries:
     - https://k8snetworkplumbingwg.github.io/helm-charts/release/sriov-network-operator-4.7.0.tgz
     version: 4.7.0
   - apiVersion: v2
-    appVersion: 1.1.0
-    created: "2021-12-16T14:30:36.568932983+02:00"
+    appVersion: 1.2.0
+    created: "2022-07-04T15:14:07.354892335Z"
     description: SR-IOV network operator configures and manages SR-IOV networks in
       the kubernetes cluster
-    digest: fd1a5d275a2e330a6265674ab2adc18a4b91ecf60ba921b818bd8faaaec19bd2
+    digest: 7aabe8eae545fb14288d05b6271326a2c2bfdec1e5e2d1250821baca83b37cc8
+    home: https://github.com/k8snetworkplumbingwg/sriov-network-operator
+    keywords:
+    - sriov
+    kubeVersion: '>= 1.17.0'
+    name: sriov-network-operator
+    sources:
+    - https://github.com/k8snetworkplumbingwg/sriov-network-operator
+    type: application
+    urls:
+    - https://k8snetworkplumbingwg.github.io/helm-charts/release/sriov-network-operator-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
+    appVersion: 1.1.0
+    created: "2022-07-04T15:14:07.354346664Z"
+    description: SR-IOV network operator configures and manages SR-IOV networks in
+      the kubernetes cluster
+    digest: f4d09e0521aadf5cd4e7d26a0411c9b56429417b1fc2ea77e2bb706aa31b1592
     home: https://github.com/k8snetworkplumbingwg/sriov-network-operator
     keywords:
     - sriov
@@ -35,4 +52,4 @@ entries:
     urls:
     - https://k8snetworkplumbingwg.github.io/helm-charts/release/sriov-network-operator-1.1.0.tgz
     version: 1.1.0
-generated: "2021-12-16T14:30:36.567620251+02:00"
+generated: "2022-07-04T15:14:07.353704214Z"
