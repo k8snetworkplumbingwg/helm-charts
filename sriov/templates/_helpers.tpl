@@ -33,6 +33,9 @@ name: {{ .Values.serviceAccount.name }}
 - key: node-role.kubernetes.io/master
   operator: Exists
   effect: NoSchedule
+- key: node-role.kubernetes.io/control-plane
+  operator: Exists
+  effect: NoSchedule
 {{- if index .Values "tolerations" }}
 {{- if gt (len .Values.tolerations) 0 }}
 {{ toYaml .Values.tolerations }}

@@ -19,7 +19,7 @@ metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
   namespace: kube-system
 data:
-  dp-conf.json: |-
+  config.json: |-
 {{ toJson .Values.config.sriov_device_plugin | indent 4 }}
 {{- end }}
 {{- end }}
