@@ -21,11 +21,11 @@
 images:
   registry: docker.io
   sriovCni:
-    repository: nfvpe/sriov-cni
-    tag: v2.2
+    repository: ghcr.io/k8snetworkplumbingwg/sriov-cni
+    tag: v2.6.3
   sriovDevicePlugin:
-    repository: nfvpe/sriov-device-plugin
-    tag: v3.1
+    repository: ghcr.io/k8snetworkplumbingwg/sriov-network-device-plugin
+    tag: v3.5.1
   pullPolicy: IfNotPresent
 
 #imagePullSecrets: []
@@ -89,9 +89,10 @@ config:
   scMountPaths:
     cnibin: "/host/opt/cni/bin"
   sdpMountPaths:
-    deviceSock: "/var/lib/kubelet/device-plugins/"
+    deviceSock: "/var/lib/kubelet"
     log: "/var/log"
-    configVolume: "/etc/pcidp/config.json"
+    configVolume: "/etc/pcidp/"
+    deviceInfoPath: "/var/run/k8s.cni.cncf.io/devinfo/dp"
   sriov_device_plugin:
     resourceList:
     - resourceName: intel_sriov_netdevice
@@ -101,9 +102,11 @@ config:
         devices:
         - 154c
         - 10ed
+        - 1889
         drivers:
         - i40evf
         - ixgbevf
+        - iavf
     - resourceName: intel_sriov_dpdk
       selectors:
         vendors:
@@ -111,6 +114,7 @@ config:
         devices:
         - 154c
         - 10ed
+        - 1889
         drivers:
         - vfio-pci
         pfNames:
@@ -125,6 +129,7 @@ config:
         - '1018'
         drivers:
         - mlx5_ib
+        - mlx5_core
   netAttachDef:
     dpdkName: 30-intel-sriov-dpdk
     dpdkResourceName: intel.com/intel_sriov_dpdk
@@ -155,10 +160,10 @@ manifests:
   configMap_sriov_device_plugin: true
   daemonSet_sriov_device_plugin: true
   daemonSet_sriov_cni: true
-  net_attach_def_netdev: true
-  net_attach_def_dpdk: true
-  test_netdevice: true
-  test_dpdk: true
+  net_attach_def_netdev: false
+  net_attach_def_dpdk: false
+  test_netdevice: false
+  test_dpdk: false
 
 #tolerations: []
 

@@ -60,7 +60,8 @@ spec:
           mountPath: {{ .Values.config.sdpMountPaths.log }}
         - name: config-volume
           mountPath: {{ .Values.config.sdpMountPaths.configVolume }}
-          subPath: "dp-conf.json"
+        - name: device-info
+          mountPath: {{ .Values.config.sdpMountPaths.deviceInfoPath }}
       volumes:
         - name: devicesock
           hostPath:
@@ -71,5 +72,12 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
+            items:
+            - key: config.json
+              path: config.json
+        - name: device-info
+          hostPath:
+            path: {{ .Values.config.sdpMountPaths.deviceInfoPath }}
+            type: DirectoryOrCreate
 {{- end }}
 {{- end }}
