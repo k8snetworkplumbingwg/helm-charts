@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "whereabouts.fullname" . }}
@@ -33,7 +33,7 @@ spec:
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
               command:
-                - /ip-reconciler
+                - /ip-control-loop
                 - -log-level=verbose
               volumeMounts:
                 - name: cni-net-dir
