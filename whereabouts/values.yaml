@@ -41,7 +41,9 @@ resources:
     memory: "50Mi"
 
 nodeSelector:
-  beta.kubernetes.io/arch: amd64
+  kubernetes.io/arch: amd64
+
+reconcilerCronExpression: "30 4 * * *"
 
 tolerations:
   - operator: Exists
