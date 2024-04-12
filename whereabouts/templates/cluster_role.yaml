@@ -28,13 +28,18 @@ rules:
   verbs:
   - list
   - watch
-- apiGroups: ["k8s.cni.cncf.io"]
+- apiGroups: [""]
   resources:
-  - network-attachment-definitions
+  - nodes
   verbs:
   - get
-  - list
-  - watch
+- apiGroups: ["k8s.cni.cncf.io"]
+  resources:
+    - network-attachment-definitions
+  verbs:
+    - get
+    - list
+    - watch
 - apiGroups:
   - ""
   - events.k8s.io
@@ -44,3 +49,4 @@ rules:
   - create
   - patch
   - update
+  - get

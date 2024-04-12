@@ -31,30 +31,50 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-          - name: WHEREABOUTS_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-          - name: cnibin
-            mountPath: /host/opt/cni/bin
-          - name: cni-net-dir
-            mountPath: /host/etc/cni/net.d
-      volumes:
+      - name: {{ .Chart.Name }}
+        command: [ "/bin/sh" ]
+        args:
+        - -c
+        - >
+          SLEEP=false /install-cni.sh &&
+          /ip-control-loop -log-level debug
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: NODENAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: WHEREABOUTS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
         - name: cnibin
-          hostPath:
-            path: /opt/cni/bin
+          mountPath: /host/opt/cni/bin
         - name: cni-net-dir
-          hostPath:
-            path: /etc/cni/net.d
+          mountPath: /host/etc/cni/net.d
+        - name: cron-scheduler-configmap
+          mountPath: /cron-schedule
+      volumes:
+      - name: cnibin
+        hostPath:
+          path: /opt/cni/bin
+      - name: cni-net-dir
+        hostPath:
+          path: /etc/cni/net.d
+      - name: cron-scheduler-configmap
+        configMap:
+          name: "{{ include "whereabouts.fullname" . }}-config"
+          defaultMode: 0744
+          items:
+          - key: "cron-expression"
+            path: "config"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
