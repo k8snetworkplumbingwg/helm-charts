@@ -24,6 +24,11 @@ rules:
   - '*'
 - apiGroups: [""]
   resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups: [""]
+  resources:
   - pods
   verbs:
   - list
@@ -44,3 +49,4 @@ rules:
   - create
   - patch
   - update
+  - get
