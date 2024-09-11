@@ -47,7 +47,7 @@ spec:
         effect: NoSchedule
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-      - name: kube-{{ .Chart.Name }}
+      - name: multus
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
@@ -55,14 +55,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        command:
-          - /bin/bash
-          - -cex
-          - |
-            #!/bin/bash
-            sed "s|__KUBERNETES_NODE_NAME__|${KUBERNETES_NODE_NAME}|g" /tmp/multus-conf/00-multus.conf.template > /tmp/multus-conf/00-multus.conf
-            /entrypoint.sh \
-              --multus-conf-file=/tmp/multus-conf/00-multus.conf
+        command: ["/thin_entrypoint"]
+        args:
+          - "--multus-conf-file=auto"
+          - "--multus-autoconfig-dir=/host/etc/cni/net.d"
+          - "--cni-conf-dir=/host/etc/cni/net.d"
         {{- if .Values.pod.resources.multus }}
         resources: {{- toYaml .Values.pod.resources.multus | nindent 10 }}
         {{- end }}
@@ -73,11 +70,26 @@ spec:
           mountPath: /host/etc/cni/net.d
         - name: cnibin
           mountPath: /host/opt/cni/bin
-        {{- if .Values.manifests.configMap }}
         - name: multus-cfg
-          mountPath: /tmp/multus-conf/00-multus.conf.template
-          subPath: "cni-conf.json"
-        {{- end }}
+          mountPath: /tmp/multus-conf
+      initContainers:
+      - name: install-multus-binary
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        command: [ "/install_multus" ]
+        args:
+          - "--type"
+          - "thin"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "15Mi"
+        securityContext:
+          privileged: true
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+          - name: cnibin
+            mountPath: /host/opt/cni/bin
+            mountPropagation: Bidirectional
       volumes:
         - name: cni
           hostPath:
@@ -85,10 +97,8 @@ spec:
         - name: cnibin
           hostPath:
             path: /opt/cni/bin
-        {{- if .Values.manifests.configMap }}
         - name: multus-cfg
           configMap:
             name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
-        {{- end }}
 {{- end }}
 {{- end }}
