@@ -20,7 +20,7 @@
 
 image:
   repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-  tag: v3.8
+  tag: v4.1.0
   pullPolicy: IfNotPresent
 
 #imagePullSecrets: []
