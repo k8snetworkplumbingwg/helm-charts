@@ -1,0 +1,43 @@
+name: Multus Chart Test
+
+on:
+  push:
+    paths:
+        - 'multus/**'
+        - '.github/workflows/helm_test_multus.yml'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:  # Allows manually triggering the workflow
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.0' # specify the Helm version you want to use
+
+      - name: Set up Kubernetes (kind)
+        uses: helm/kind-action@v1.2.0
+        with:
+          version: v0.17.0 # specify the kind version you want to use
+
+      - name: Helm Lint Multus
+        run: helm lint multus
+
+      - name: Install Helm chart multus
+        run: helm install --wait --timeout 60s multus-release ./multus
+
+      - name: Run Helm tests
+        run: helm test multus-release --timeout 60s
+
+      - name: Delete Helm release
+        run: helm uninstall multus-release
