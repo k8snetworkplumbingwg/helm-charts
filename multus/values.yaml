@@ -16,10 +16,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-#replicaCount: 1
-
 image:
+  # -- Repository for the Multus image.
   repository: ghcr.io/k8snetworkplumbingwg/multus-cni
+  # -- Tag of the Multus image.
   tag: v4.1.0
   pullPolicy: IfNotPresent
 
@@ -35,78 +35,68 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: multus
+# -- Resources for the Multus pod.
+resources:
+    requests:
+      memory: "128Mi"
+      cpu: "250m"
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
 
-pod:
-  resources:
-    enabled: false
-    multus:
-      requests:
-        memory: "128Mi"
-        cpu: "250m"
-      limits:
-        memory: "1024Mi"
-        cpu: "2000m"
-
-#podSecurityContext: {}
-  # fsGroup: 2000
-
-#securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-#service:
-  #type: ClusterIP
-  #port: 80
-
-#ingress:
-  #enabled: false
-  #annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  #hosts:
-    #- host: chart-example.local
-    #  paths: []
-  #tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-labels:
-  nodeSelector: 
-    kubernetes.io/arch: amd64
-
-config:
-  cni_conf:
-    name: multus-cni-network
-    type: multus
-    kubeconfig: /etc/cni/net.d/multus.d/multus.kubeconfig
-    cniVersion: 0.3.1
-    confDir: /etc/cni/net.d
-    cniDir: /var/lib/cni/multus
-    binDir: /opt/cni/bin
-    logFile: /var/log/multus.log
-    logLevel: panic
-    capabilities:
-      portMappings: true
-    readinessindicatorfile: ""
-    namespaceIsolation: false
-    clusterNetwork: k8s-pod-network
-    defaultNetwork: []
-    delegates: []
-    systemNamespaces: ["kube-system"]
-
-manifests:
-  serviceAccount: true
-  clusterRole: true
-  clusterRoleBinding: true
-  configMap: true
-  daemonSet: true
-  customResourceDefinition: true
-
-#tolerations: []
-
-#affinity: {}
+args:
+  # -- The directory where CNI binaries are installed.
+  cniBinDir: "/host/opt/cni/bin"
+  # -- The directory where CNI configurations are stored.
+  cniConfDir: "/host/etc/cni/net.d"
+  # -- Version of the CNI to use.
+  cniVersion: ""
+  # -- The configuration file for Multus.
+  multusConfFile: "auto"
+  # -- Path to the Multus binary file.
+  multusBinFile: "/usr/src/multus-cni/bin/multus"
+  # -- Directory for Multus-specific CNI configurations.
+  multusCNIConfDir: "/host/etc/cni/multus/net.d"
+  # -- Whether to skip copying the Multus binary file.
+  skipMultusBinaryCopy: false
+  # -- Path to the kubeconfig file for Multus.
+  multusKubeConfigFileHost: "/etc/cni/net.d/multus.d/multus.kubeconfig"
+  # -- Name of the master CNI file in the Multus auto-configuration directory.
+  multusMasterCNIFileName: ""
+  # -- Enable namespace isolation.
+  namespaceIsolation: false
+  # -- Comma-separated list of global namespaces for use with namespace isolation.
+  globalNamespaces: ""
+  # -- Directory for the Multus auto-configuration.
+  multusAutoconfigDir: "/host/etc/cni/net.d"
+  # -- Whether to log to stderr.
+  multusLogToStderr: true
+  # -- Log level for Multus.
+  multusLogLevel: ""
+  # -- Path to the Multus log file.
+  multusLogFile: ""
+  # -- Override the network name from the master CNI file.
+  overrideNetworkName: false
+  # -- Cleanup configuration files on exit.
+  cleanupConfigOnExit: false
+  # -- Skip watching for configuration changes.
+  skipConfigWatch: false
+  # -- Rename the master configuration file to invalidate it.
+  renameConfFile: false
+  # -- File used to indicate readiness.
+  readinessIndicatorFile: ""
+  # -- Additional directory to include in the CNI binDir option.
+  additionalBinDir: ""
+  # -- Skip TLS verification.
+  skipTLSVerify: false
+  # -- Force the use of a specific CNI version.
+  forceCNIVersion: false
+# -- Node selector for pod assignment.
+nodeSelector: {}
+# -- Tolerations for pod assignment.
+tolerations:
+  - operator: Exists
+    effect: NoSchedule
+# -- securityContext for the pod.
+securityContext:
+  privileged: true

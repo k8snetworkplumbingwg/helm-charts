@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 {{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
-{{- if .Values.manifests.daemonSet }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -32,8 +31,6 @@ spec:
     metadata:
       labels:
 {{- include "multus.labels" . | indent 8 }}
-      annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-node-critical
       hostNetwork: true
@@ -41,10 +38,13 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{ . }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-      - operator: Exists
-        effect: NoSchedule
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: multus
@@ -57,21 +57,88 @@ spec:
               fieldPath: spec.nodeName
         command: ["/thin_entrypoint"]
         args:
-          - "--multus-conf-file=auto"
-          - "--multus-autoconfig-dir=/host/etc/cni/net.d"
-          - "--cni-conf-dir=/host/etc/cni/net.d"
-        {{- if .Values.pod.resources.multus }}
-        resources: {{- toYaml .Values.pod.resources.multus | nindent 10 }}
+          {{- with .Values.args.cniBinDir }}
+          - --cni-bin-dir={{ . }}
+          {{- end }}
+          {{- with .Values.args.cniConfDir }}
+          - --cni-conf-dir={{ . }}
+          {{- end }}
+          {{- with .Values.args.cniVersion }}
+          - --cni-version={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusConfFile }}
+          - --multus-conf-file={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusBinFile }}
+          - --multus-bin-file={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusCNIConfDir }}
+          - --multus-cni-conf-dir={{ . }}
+          {{- end }}
+          {{- with .Values.args.skipMultusBinaryCopy }}
+          - --skip-multus-binary-copy={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusKubeConfigFileHost }}
+          - --multus-kubeconfig-file-host={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusMasterCNIFileName }}
+          - --multus-master-cni-file-name={{ . }}
+          {{- end }}
+          {{- with .Values.args.namespaceIsolation }}
+          - --namespace-isolation={{ . }}
+          {{- end }}
+          {{- with .Values.args.globalNamespaces }}
+          - --global-namespaces={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusAutoconfigDir }}
+          - --multus-autoconfig-dir={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusLogToStderr }}
+          - --multus-log-to-stderr={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusLogLevel }}
+          - --multus-log-level={{ . }}
+          {{- end }}
+          {{- with .Values.args.multusLogFile }}
+          - --multus-log-file={{ . }}
+          {{- end }}
+          {{- with .Values.args.overrideNetworkName }}
+          - --override-network-name={{ . }}
+          {{- end }}
+          {{- with .Values.args.cleanupConfigOnExit }}
+          - --cleanup-config-on-exit={{ . }}
+          {{- end }}
+          {{- with .Values.args.skipConfigWatch }}
+          - --skip-config-watch={{ . }}
+          {{- end }}
+          {{- with .Values.args.renameConfFile }}
+          - --rename-conf-file={{ . }}
+          {{- end }}
+          {{- with .Values.args.readinessIndicatorFile }}
+          - --readiness-indicator-file={{ . }}
+          {{- end }}
+          {{- with .Values.args.additionalBinDir }}
+          - --additional-bin-dir={{ . }}
+          {{- end }}
+          {{- with .Values.args.skipTLSVerify }}
+          - --skip-tls-verify={{ . }}
+          {{- end }}
+          {{- with .Values.forceCNIVersion }}
+          - --force-cni-version={{ . }}
+          {{- end }}
+        {{- with .Values.resources}}
+        resources:
+          {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- with .Values.securityContext}}
         securityContext:
-          privileged: true
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: cni
           mountPath: /host/etc/cni/net.d
         - name: cnibin
           mountPath: /host/opt/cni/bin
-        - name: multus-cfg
-          mountPath: /tmp/multus-conf
       initContainers:
       - name: install-multus-binary
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -97,8 +164,5 @@ spec:
         - name: cnibin
           hostPath:
             path: /opt/cni/bin
-        - name: multus-cfg
-          configMap:
-            name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
 {{- end }}
-{{- end }}
+
