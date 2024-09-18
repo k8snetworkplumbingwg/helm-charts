@@ -97,6 +97,8 @@ nodeSelector: {}
 tolerations:
   - operator: Exists
     effect: NoSchedule
+  - operator: Exists
+    effect: NoExecute
 # -- securityContext for the pod.
 securityContext:
   privileged: true
