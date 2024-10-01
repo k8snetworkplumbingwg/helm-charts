@@ -18,11 +18,12 @@ metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}-ds
   namespace: kube-system
   labels:
-{{- include "multus.labels" . | indent 4 }}
+    {{- include "multus.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:
       app: multus
+      {{- include "multus.labels" . | indent 8 }}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -30,7 +31,8 @@ spec:
   template:
     metadata:
       labels:
-{{- include "multus.labels" . | indent 8 }}
+        app: multus
+        {{- include "multus.labels" . | indent 8 }}
     spec:
       priorityClassName: system-node-critical
       hostNetwork: true
