@@ -23,7 +23,7 @@ spec:
   selector:
     matchLabels:
       app: multus
-      {{- include "multus.labels" . | indent 8 }}
+      {{- include "multus.labels" . | indent 6 }}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
