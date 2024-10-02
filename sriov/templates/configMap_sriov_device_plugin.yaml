@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 {{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
-{{- if .Values.manifests.configMap_sriov_device_plugin }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,6 +19,5 @@ metadata:
   namespace: kube-system
 data:
   dp-conf.json: |-
-{{ toJson .Values.config.sriov_device_plugin | indent 4 }}
-{{- end }}
+    {{ toJson .Values.config.sriov_device_plugin | indent 4 }}
 {{- end }}

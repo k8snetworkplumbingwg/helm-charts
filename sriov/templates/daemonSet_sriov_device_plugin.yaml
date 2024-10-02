@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 {{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
-{{- if .Values.manifests.daemonSet_sriov_device_plugin }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -23,8 +22,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-{{- include "sriov-dp.serviceAccount.Name" . | indent 6 }}
-{{- include "sriov-dp.labels" . | indent 6 }}
+      {{- include "sriov-dp.serviceAccount.Name" . | indent 6 }}
+      {{- include "sriov-dp.labels" . | indent 6 }}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -32,26 +31,34 @@ spec:
   template:
     metadata:
       labels:
-{{- include "sriov-dp.serviceAccount.Name" . | indent 8 }}
-{{- include "sriov-dp.labels" . | indent 8 }}
+        {{- include "sriov-dp.serviceAccount.Name" . | indent 8 }}
+        {{- include "sriov-dp.labels" . | indent 8 }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configMap_sriov_device_plugin.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-node-critical
       hostNetwork: true
-      nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{- include "sriov.tolerations" . | indent 6 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-{{ .Chart.Name }}-dp
         image: {{ .Values.images.sriovDevicePlugin.repository }}:{{ .Values.images.sriovDevicePlugin.tag }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
+        {{- with .Values.args}}
         args:
-        - --log-dir=sriovdp
-        - --log-level=10
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.securityContext }}
         securityContext:
-          privileged: {{ .Values.securityContext.privileged }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: devicesock
           mountPath: {{ .Values.config.sdpMountPaths.deviceSock }}
@@ -71,5 +78,4 @@ spec:
         - name: config-volume
           configMap:
             name: {{ .Release.Name }}-{{ .Chart.Name }}-{{ .Chart.Version }}-config
-{{- end }}
 {{- end }}

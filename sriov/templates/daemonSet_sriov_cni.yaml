@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 {{- if or ( gt .Capabilities.KubeVersion.Major "1" ) ( ge .Capabilities.KubeVersion.Minor "16" ) }}
-{{- if .Values.manifests.daemonSet_sriov_cni }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}-cni-ds
   namespace: kube-system
   labels:
-{{- include "sriov-cni.labels" . | indent 4 }}
+    {{- include "sriov-cni.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-{{- include "sriov-cni.labels" . | indent 6 }}
+      {{- include "sriov-cni.labels" . | nindent 6 }}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
@@ -31,22 +30,34 @@ spec:
   template:
     metadata:
       labels:
-{{- include "sriov-cni.labels" . | indent 8 }}
+        {{- include "sriov-cni.labels" . | nindent 8 }}
     spec:
       hostNetwork: true
-      nodeSelector: {{- toYaml .Values.labels.nodeSelector | nindent 8 }}
+      priorityClassName: system-node-critical
+      {{- with .Values.nodeSelector}}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{- include "sriov.tolerations" . | indent 6 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-{{ .Chart.Name }}-cni
         image: {{ .Values.images.sriovCni.repository }}:{{ .Values.images.sriovCni.tag }}
         imagePullPolicy: {{ .Values.images.pullPolicy }}
+        {{- with .Values.securityContext}}
         securityContext:
-          privileged: {{ .Values.securityContext.privileged }}
-        {{- if .Values.pod.resources.enabled }}
-        resources: {{- toYaml .Values.pod.resources.sriov_cni | nindent 10 }}
+          {{- toYaml . | nindent 10 }}
         {{- end }}
+        resources:
+          requests:
+              memory: "50Mi"
+              cpu: "100m"
+          limits:
+              memory: "50Mi"
+              cpu: "100m"
         volumeMounts:
         - name: cnibin
           mountPath: {{ .Values.config.scMountPaths.cnibin }}
@@ -54,5 +65,4 @@ spec:
         - name: cnibin
           hostPath:
             path: /opt/cni/bin
-{{- end }}
 {{- end }}
