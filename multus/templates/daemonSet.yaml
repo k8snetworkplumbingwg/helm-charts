@@ -18,6 +18,7 @@ metadata:
   name: {{ .Release.Name }}-{{ .Chart.Name }}-ds
   namespace: kube-system
   labels:
+    app: multus
     {{- include "multus.labels" . | indent 4 }}
 spec:
   selector:
