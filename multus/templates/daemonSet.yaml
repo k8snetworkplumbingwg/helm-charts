@@ -45,6 +45,8 @@ spec:
       tolerations:
       - operator: Exists
         effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: kube-{{ .Chart.Name }}
@@ -61,7 +63,7 @@ spec:
           - |
             #!/bin/bash
             sed "s|__KUBERNETES_NODE_NAME__|${KUBERNETES_NODE_NAME}|g" /tmp/multus-conf/00-multus.conf.template > /tmp/multus-conf/00-multus.conf
-            /entrypoint.sh \
+            /thin_entrypoint \
               --multus-conf-file=/tmp/multus-conf/00-multus.conf
         {{- if .Values.pod.resources.multus }}
         resources: {{- toYaml .Values.pod.resources.multus | nindent 10 }}
@@ -78,6 +80,23 @@ spec:
           mountPath: /tmp/multus-conf/00-multus.conf.template
           subPath: "cni-conf.json"
         {{- end }}
+      
+      initContainers:
+        - name: install-multus-binary
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command: ["/install_multus"]
+          args:
+            - "--type"
+            - "thin"
+          {{- if .Values.pod.resources.multus }}
+          resources: {{- toYaml .Values.pod.resources.multus | nindent 10 }}
+          {{- end }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: cnibin
+              mountPath: /host/opt/cni/bin
+              mountPropagation: Bidirectional
       volumes:
         - name: cni
           hostPath:
